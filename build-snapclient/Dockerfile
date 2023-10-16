@@ -1,5 +1,8 @@
 FROM debian:bookworm
 
+#ARG TAG=v0.27.0  This version does not include the debian package build yet
+ARG TAG=d3f11a62d06790cfc8c6d9829bbc25cf8fffd366
+
 RUN set -eux \
   ; apt-get update -yqq \
   ; DEBIAN_FRONTEND=noninteractive apt-get install -yqq --no-install-recommends \
@@ -24,6 +27,7 @@ RUN set -eux \
     python3 \
   ; git clone https://github.com/badaix/snapcast.git \
   ; cd snapcast \
+  ; git checkout $TAG \
 #  ; mkdir build \
 #  ; cd build \
 #   ; cmake .. \
