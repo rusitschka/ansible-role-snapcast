@@ -4,7 +4,7 @@
   when: snapcast_architecture != "arm64"
   become: true
   apt:
-    deb: "https://github.com/badaix/snapcast/releases/download/v{{ snapcast_version }}/snapclient_{{ snapcast_version }}{{ snapcast_version_suffix }}_{{ snapcast_architecture}}.deb"
+    deb: "https://github.com/badaix/snapcast/releases/download/v{{ snapcast_version }}/snapclient_{{ snapcast_version }}{{ snapcast_version_suffix }}_without-pulse_{{ snapcast_architecture}}.deb"
   notify:
     - restart snapclient
 - name: "Copy Snapcast client to remote"
