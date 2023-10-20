@@ -1,38 +1,46 @@
 ---
 # tasks file for snapclient
-- name: "Ensure the Snapcast client is installed"
-  when: snapcast_architecture != "arm64"
+- name: "Install snapclient from regular sources"
+  when: snapcast_install_regular_package
   become: true
-  apt:
-    deb: "https://github.com/badaix/snapcast/releases/download/v{{ snapcast_version }}/snapclient_{{ snapcast_version }}{{ snapcast_version_suffix }}_without-pulse_{{ snapcast_architecture}}.deb"
+  ansible.builtin.apt:
+    pkg: snapclient
   notify:
     - restart snapclient
-- name: "Copy Snapcast client to remote"
-  when: snapcast_architecture == "arm64"
+- name: "Install snapclient via release deb"
+  when: not snapcast_install_regular_package and snapcast_architecture == "amd64"
   become: true
-  copy:
-    src: "snapclient_{{ snapcast_version }}{{ snapcast_version_suffix }}_{{ snapcast_architecture}}.deb"
+  ansible.builtin.apt:
+    deb: "https://github.com/badaix/snapcast/releases/download/v{{ snapcast_version }}/snapclient_{{ snapcast_version }}{{ snapcast_version_suffix }}_without-pulse_{{ snapcast_architecture }}.deb"
+  notify:
+    - restart snapclient
+- name: "Install snapclient via supplied deb package (copy)"
+  when: not snapcast_install_regular_package and snapcast_architecture == "arm64"
+  become: true
+  ansible.builtin.copy:
+    src: "snapclient_{{ snapcast_version }}{{ snapcast_version_suffix }}_{{ snapcast_architecture }}.deb"
     dest: "/tmp/snapclient.deb"
-- name: "Ensure the Snapcast client is installed"
-  when: snapcast_architecture == "arm64"
+    mode: "0644"
+- name: "Install snapclient via supplied deb package (install)"
+  when: not snapcast_install_regular_package and snapcast_architecture == "arm64"
   become: true
-  apt:
+  ansible.builtin.apt:
     deb: "/tmp/snapclient.deb"
   notify:
     - restart snapclient
 - name: "Ensure /var/lib/snapclient exists (to prevent runtime warnings)"
   become: true
-  file:
+  ansible.builtin.file:
     path: /var/lib/snapclient
     state: directory
-    owner: "{{ snapcast_client_user }}"
+    owner: "{{ '_snapclient' if snapcast_install_regular_package else 'snapclient' }}"
     group: audio
-    mode: 0755
+    mode: "0755"
   notify:
     - restart snapclient
 - name: "Ensure the options to the Snapclient daemon are set"
   become: true
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/default/snapclient
     regexp: "^SNAPCLIENT_OPTS="
     line: "SNAPCLIENT_OPTS=\"{{ snapcast_client_daemon_options }}\""
@@ -40,7 +48,7 @@
     - restart snapclient
 - name: "Ensure the snapclient user has a shell set. If it hasn't, the client won't play audio properly. See https://github.com/badaix/snapcast/issues/229#issuecomment-328167681."
   become: true
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/passwd
     regexp: "^snapclient:(.*):/var/lib/snapclient:$"
     line: "snapclient:\\1:/var/lib/snapclient:/usr/sbin/nologin"
