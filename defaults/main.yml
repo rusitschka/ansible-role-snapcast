@@ -2,7 +2,7 @@
 # defaults file for snapcast
 snapcast_architecture: amd64
 snapcast_client_daemon_options: ""
-snapcast_download_zip_suffix: "{{ ansible_distribution | lower }}-{{ ansible_distribution_release }}"
+snapcast_download_zip_suffix: "{{ ansible_distribution_release }}"
 snapcast_install_client: false
 snapcast_install_regular_package: false
 snapcast_install_server: false

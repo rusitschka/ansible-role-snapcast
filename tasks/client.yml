@@ -11,24 +11,14 @@
   become: true
   when: not snapcast_install_regular_package # and snapcast_architecture == "amd64"
   block:
-    - name: Download zip archive
+    - name: Download deb
       ansible.builtin.get_url:
-        url: "https://github.com/badaix/snapcast/releases/download/v{{ snapcast_version }}/snapcast_{{ snapcast_version }}_{{ snapcast_architecture }}-{{ snapcast_download_zip_suffix }}.zip"
-        dest: "/tmp/snapcast.zip"
-        mode: "0555"
-    - name: Create tmp directory
-      ansible.builtin.file:
-        path: /tmp/snapcast
-        state: directory
-        mode: '0755'
-    - name: Unzip archive
-      ansible.builtin.unarchive:
-        src: "/tmp/snapcast.zip"
-        dest: "/tmp/snapcast"
-        remote_src: true
+        url: "https://github.com/badaix/snapcast/releases/download/v{{ snapcast_version }}/snapclient_{{ snapcast_version }}{{ snapcast_version_suffix }}_{{ snapcast_architecture }}_{{ snapcast_download_zip_suffix }}.deb"
+        dest: "/tmp/snapclient.deb"
+        mode: "0644"
     - name: Install deb package
       ansible.builtin.apt:
-        deb: "/tmp/snapcast/snapclient_{{ snapcast_version }}{{ snapcast_version_suffix }}_without-pulse_{{ snapcast_architecture }}.deb"
+        deb: "/tmp/snapclient.deb"
       notify:
         - restart snapclient
     - name: Remove temporary files
@@ -36,8 +26,7 @@
         path: '{{ item }}'
         state: absent
       with_items:
-        - /tmp/snapcast
-        - /tmp/snapcast.zip
+        - /tmp/snapclient.deb
 # - name: "Install snapclient via supplied deb package (copy)"
 #   when: not snapcast_install_regular_package and snapcast_architecture == "arm64"
 #   become: true
