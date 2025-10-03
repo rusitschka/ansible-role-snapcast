@@ -9,4 +9,4 @@ snapcast_install_server: false
 snapcast_server_buffer_ms: 1000
 snapcast_server_daemon_options: ""
 snapcast_version_suffix: "-1"
-snapcast_version: "0.33.0"
+snapcast_version: "0.34.0"
