@@ -13,7 +13,7 @@
   block:
     - name: Download deb
       ansible.builtin.get_url:
-        url: "https://github.com/badaix/snapcast/releases/download/v{{ snapcast_version }}/snapclient_{{ snapcast_version }}{{ snapcast_version_suffix }}_{{ snapcast_architecture }}_{{ snapcast_download_zip_suffix }}.deb"
+        url: "https://github.com/snapcast/snapcast/releases/download/v{{ snapcast_version }}/snapclient_{{ snapcast_version }}{{ snapcast_version_suffix }}_{{ snapcast_architecture }}_{{ snapcast_download_zip_suffix }}.deb"
         dest: "/tmp/snapclient.deb"
         mode: "0644"
     - name: Install deb package
